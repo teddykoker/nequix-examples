@@ -1,0 +1,15 @@
+tolerance 1.5
+filetype xyz
+output nacl_h2o.xyz
+# NOTE: packmol does support periodic boundary conditions
+# pbc 27.8 27.8 27.8
+
+structure nacl.xyz
+  number 1
+  fixed 10.0 10.0 10.0 0.0 0.0 0.0
+end structure
+
+structure h2o.xyz
+  number 625
+  inside box 0. 0. 0. 27.8 27.8 27.8
+end structure
