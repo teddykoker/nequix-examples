@@ -43,9 +43,7 @@ dyn = Bussi(
 )
 
 
-traj = Trajectory(
-    "/data/NFS/radish/tekoker/nequix-examples/nacl-dissolution/nvt.traj", "w", atoms
-)
+traj = Trajectory("nvt.traj", "w", atoms)
 dyn.attach(traj.write, interval=10)
 logger = MDLogger(
     dyn, atoms, "nvt.log", header=True, stress=False, peratom=False, mode="w"
