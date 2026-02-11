@@ -19,3 +19,13 @@ See [`phonon`](./phonon/).
 <img src="phonon/mp-149_bs.png" alt="Si phonon bandstructure" width="200" />
 
 Phonon bandstructure of Si with Nequix MP 1 and the PFT version introduced in [Phonon fine-tuning (PFT)](https://arxiv.org/abs/2601.07742).
+
+## PFT Demo
+
+See [`pft`](./pft/).
+
+<img src="pft/figures/pft_loss_pretrained.png" alt="PFT loss curves" width="200" />
+
+Code from my [demo](https://teddykoker.com/2026/02/pft/) of stochastic HVP method for fine-tuning machine-learned interatomic
+potentials on phonon calculations, as used in [Phonon fine-tuning
+(PFT)](https://arxiv.org/abs/2601.07742).
