@@ -3,11 +3,6 @@
 # dependencies = ["torch", "phonopy", "seekpath", "numpy", "nequix[torch]", "ase"]
 # ///
 
-# /// script
-# requires-python = ">=3.10"
-# dependencies = ["torch", "phonopy", "numpy", "nequix[torch]", "ase"]
-# ///
-
 import time
 
 import ase
