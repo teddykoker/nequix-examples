@@ -1,22 +1,16 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["ase", "phonopy", "nequix", "matplotlib", "seekpath"]
+# dependencies = ["ase", "phonopy", "nequix>=0.4.3", "matplotlib", "seekpath"]
 # ///
 
 import matplotlib.pyplot as plt
-import numpy as np
 import phonopy
 from ase import Atoms
 from ase.filters import FrechetCellFilter
 from ase.optimize import FIRE
 from mpl_toolkits.axes_grid1 import ImageGrid
 from phonopy.phonon.band_structure import BandPlot
-import equinox as eqx
-import jax
-import jax.numpy as jnp
 from nequix.calculator import NequixCalculator
-from nequix.data import dict_to_graphstuple, atomic_numbers_to_indices, preprocess_graph
-from nequix.pft.hessian import hessian_linearized
 
 distance = 0.01
 filename = "mp-149.yaml"
@@ -33,13 +27,14 @@ ph_ref = phonopy.load(filename)
 bs_mlips = []
 
 for model_name, autodiff in zip(model_names, autodiffs):
+    calc = NequixCalculator(model_name=model_name, use_kernel=False)
     ase_cell = Atoms(
         cell=ph_ref.unitcell.cell,
         symbols=ph_ref.unitcell.symbols,
         scaled_positions=ph_ref.unitcell.scaled_positions,
         pbc=True,
     )
-    ase_cell.calc = NequixCalculator(model_name=model_name)
+    ase_cell.calc = calc
     relax(ase_cell)
 
     ph_atoms = phonopy.structure.atoms.PhonopyAtoms(
@@ -61,14 +56,8 @@ for model_name, autodiff in zip(model_names, autodiffs):
             scaled_positions=ph_mlip.supercell.scaled_positions,
             pbc=True,
         )
-        atom_indices = atomic_numbers_to_indices(ase_cell.calc.config["atomic_numbers"])
-        graph = dict_to_graphstuple(
-            preprocess_graph(
-                ase_supercell, atom_indices, ase_cell.calc.config["cutoff"], False
-            )
-        )
-        hessian = hessian_linearized(ase_cell.calc.model, graph)
-        ph_mlip.force_constants = np.array(hessian, copy=True)
+        hessian = calc.get_hessian(ase_supercell)
+        ph_mlip.force_constants = hessian
 
     else:
         # calculate force constants using finite displacements
@@ -81,7 +70,7 @@ for model_name, autodiff in zip(model_names, autodiffs):
                 scaled_positions=supercell.scaled_positions,
                 pbc=True,
             )
-            scell.calc = NequixCalculator(model_name=model_name)
+            scell.calc = calc
             forces = scell.get_forces()
             drift_force = forces.sum(axis=0)
             for force in forces:
